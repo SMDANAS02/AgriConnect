@@ -1,0 +1,57 @@
+{
+  "users": {
+    "farmer": {
+      "name": "Karthikeyan R",
+      "email": "karthi.farmer@example.com",
+      "password": "Test123!",
+      "phone": "9876543210",
+      "role": "farmer",
+      "location": "Coimbatore"
+    },
+    "equipmentOwner": {
+      "name": "Senthil Kumar M",
+      "email": "senthil.equipment@example.com",
+      "password": "Test123!",
+      "phone": "9876543211",
+      "role": "equipment_owner",
+      "location": "Salem"
+    }
+  },
+  "equipment": {
+    "tractor": {
+      "name": "Mahindra 575 DI Tractor",
+      "category": "Tractor",
+      "description": "45 HP, 4WD, perfect for paddy fields in Salem & Coimbatore",
+      "pricePerHour": 500,
+      "pricePerDay": 3000,
+      "pricePerWeek": 18000,
+      "locationLat": 11.0168,
+      "locationLng": 76.9558,
+      "availabilityStatus": "available"
+    },
+    "transplanter": {
+      "name": "Kubota Paddy Transplanter 4-Row",
+      "category": "Transplanter",
+      "description": "Self-propelled transplanter for Cauvery Delta rice fields",
+      "pricePerHour": 400,
+      "pricePerDay": 2600,
+      "pricePerWeek": 15000,
+      "locationLat": 10.9601,
+      "locationLng": 78.0766,
+      "availabilityStatus": "available"
+    }
+  },
+  "booking": {
+    "sampleBooking": {
+      "equipmentId": 1,
+      "startDate": "2026-08-05T00:00:00Z",
+      "endDate": "2026-08-08T00:00:00Z"
+    }
+  },
+  "diseaseDetection": {
+    "sampleDiagnosis": {
+      "cropName": "Paddy / Rice",
+      "imageUrl": "https://images.unsplash.com/photo-1536053464738-4e892c9060b9?auto=format&fit=crop&q=80&w=800"
+    }
+  }
+}

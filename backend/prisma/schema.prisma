@@ -1,0 +1,117 @@
+// AgriConnect Prisma Database Schema
+// Optimized for PostgreSQL hosted on Neon / local instances
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// User Model: Represents registered farmers and equipment owners in Tamil Nadu.
+/// Handles authentication, location details, and linkages to equipment, bookings, and AI diagnoses.
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  password  String
+  phone     String?
+  role      String   @default("farmer") // Options: "farmer" | "equipment_owner"
+  location  String?  // District name (e.g. Coimbatore, Salem, Madurai, Karur)
+  createdAt DateTime @default(now())
+  
+  // Relations
+  equipment   Equipment[]
+  bookings    Booking[]
+  detections  AIDetection[]
+  reviews     Review[]
+}
+
+/// Equipment Model: Represents farm machinery available for rental in the marketplace (tractors, harvesters, pumps).
+model Equipment {
+  id                 Int      @id @default(autoincrement())
+  ownerId            Int
+  name               String
+  category           String   // E.g. "Tractor", "Harvester", "Transplanter", "Irrigation"
+  description        String?
+  pricePerHour       Float
+  pricePerDay        Float
+  pricePerWeek       Float?
+  locationLat        Float?
+  locationLng        Float?
+  availabilityStatus String   @default("available") // Options: "available" | "booked" | "unavailable"
+  rating             Float    @default(0)
+  images             String[]
+  createdAt          DateTime @default(now())
+  
+  // Relations
+  owner    User      @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  bookings Booking[]
+  reviews  Review[]
+}
+
+/// Booking Model: Stores equipment rental reservations made by farmers along with payment statuses.
+model Booking {
+  id            Int      @id @default(autoincrement())
+  equipmentId   Int
+  farmerId      Int
+  startDate     DateTime
+  endDate       DateTime
+  totalPrice    Float
+  paymentStatus String   @default("pending") // Options: "pending" | "completed" | "failed"
+  bookingStatus String   @default("pending") // Options: "pending" | "confirmed" | "cancelled" | "completed"
+  createdAt     DateTime @default(now())
+  
+  // Relations
+  equipment Equipment @relation(fields: [equipmentId], references: [id], onDelete: Cascade)
+  farmer    User      @relation(fields: [farmerId], references: [id], onDelete: Cascade)
+  review    Review?
+}
+
+/// CropDisease Model: Reference knowledge base for crop diseases, symptoms, and localized treatments.
+model CropDisease {
+  id                 Int      @id @default(autoincrement())
+  cropName           String
+  diseaseName        String
+  symptoms           String
+  treatment          String
+  preventiveMeasures String
+  imageUrl           String?
+  
+  @@index([cropName])
+  @@index([diseaseName])
+}
+
+/// AIDetection Model: Logs image uploads analyzed by Hugging Face Inference API along with predicted diagnosis.
+model AIDetection {
+  id                   Int      @id @default(autoincrement())
+  userId               Int
+  uploadedImageUrl     String
+  detectedDisease      String
+  confidenceScore      Float
+  recommendedTreatment String
+  createdAt            DateTime @default(now())
+  
+  // Relations
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+}
+
+/// Review Model: Ratings and feedback left by farmers after completing an equipment rental booking.
+model Review {
+  id          Int        @id @default(autoincrement())
+  bookingId   Int        @unique
+  userId      Int
+  equipmentId Int?
+  rating      Int
+  comment     String?
+  createdAt   DateTime   @default(now())
+  
+  // Relations
+  booking   Booking    @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+  user      User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  equipment Equipment? @relation(fields: [equipmentId], references: [id], onDelete: Cascade)
+}
